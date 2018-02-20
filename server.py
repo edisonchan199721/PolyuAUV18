@@ -45,54 +45,6 @@ def serialDisable(sNum,portName):
          serialMap[i] = None #have to check if serial.Serial() or None is better
          serialName[i] = portName
 
-# Serial mapping for arduino
-def serialMapping():
-    serialNo = [serial.Serial(),serial.Serial(),serial.Serial(),serial.Serial()] # init serial port
-    serialMapped = False
-    global serialMap
-    global serialStatus
-    global serialName
-     # for serial mapping
-    serialNo[0].write(storage.arduinoInfoCommand)
-    serialNo[1].write(storage.arduinoInfoCommand)
-    serialNo[2].write(storage.arduinoInfoCommand)
-    # serialNo[3].write(storage.arduinoInfoCommand)
-    while not (serialMapped):
-        for i in range(3):
-            try:
-               print(i,':',serialNo[i].inWaiting())
-               if(serialNo[i].inWaiting() >= 2):
-                  info = serialNo[i].read(1)
-                  if info[0] == 0xF2:
-                     detail = serialNo[i].read(1)
-                     sNum = serialNumber(detail[0])
-                     if(sNum == -1):
-                        print("Connected Arduino does not match the system / Return Data Error, data:",detail[0])
-                     else:
-                        serialMap[sNum] = serialNo[i]
-                        if(not serialStatus[sNum]):
-                           print("Serial No:",sNum+1," Port:",serialMap[sNum].port,"is online")
-                        serialStatus[sNum] = True
-                        serialName[sNum] = serialMap[sNum].port
-                  elif info[0] == 0xE1: # if go up data on Arduino3 appear first
-                     detail = serialNo[i].read(7)
-                     info += detail
-                     serialMap[2] = serialNo[i]
-                     if(not serialStatus[2]):
-                        print("Serial No: 3 Port:",serialMap[2].port,"is online")
-                     serialStatus[2] = True
-                     serialName[2] = serialMap[2].port
-            except serial.serialutil.SerialException:
-               print("Serial Error Occur, Port: ",i)
-               name = '/dev/ttyUSB'+str(i)
-               serialNo[i] = serialReconnect(name)
-
-        print(serialStatus[0],serialStatus[1],serialStatus[2],serialStatus[3])
-        #if(serialStatus[0] and serialStatus[1] and serialStatus[2] and serialStatus[3]):
-        if(serialStatus[0] and serialStatus[1]):
-            print('All Arduino is ready')
-            serialMapped = True
-
 # Send command to corresponding arduino
 def send():
     writeTo = -1
@@ -196,8 +148,64 @@ class server_thread(threading.Thread):
 
 ########################### Main ############################
 if __name__ == "__main__":
-   # serial mapping before main
-   serialMapping()
+   #----------------------------Serial Port Setup
+   # init serial variable
+   serialNo = [serial.Serial(),serial.Serial(),serial.Serial(),serial.Serial()]
+
+   # init serial port
+   command = bytearray([0xF1]) # command for get arduino type
+   serialNo[0] = serialReconnect('/dev/ttyUSB0')
+   serialNo[1] = serialReconnect('/dev/ttyUSB1')
+   serialNo[2] = serialReconnect('/dev/ttyUSB2')
+   # serialNo[3] = serialReconnect('/dev/ttyUSB3')
+   # serial mapping before main loop
+   while True:
+      # for serial mapping
+      serialNo[0].write(command)
+      serialNo[1].write(command)
+      serialNo[2].write(command)
+      # serialNo[3].write(command)
+      for i in range(3):
+         try:
+##            if(serialMapped[i]):
+##               continue
+##            else serialNo[i].write(command)
+            print(i,':',serialNo[i].inWaiting())
+            if(serialNo[i].inWaiting() >= 2):
+               info = serialNo[i].read(1)
+               if info[0] == 0xF2:
+                  detail = serialNo[i].read(1)
+                  sNum = serialNumber(detail[0])
+                  if(sNum == -1):
+                     print("Connected Arduino does not match the system / Return Data Error, data:",detail[0])
+                  else:
+                     serialMap[sNum] = serialNo[i]
+                     if(not serialStatus[sNum]):
+                        print("Serial No:",sNum+1," Port:",serialMap[sNum].port,"is online")
+                     serialStatus[sNum] = True
+##                     serialMapped[i] = True
+                     serialName[sNum] = serialMap[sNum].port
+               elif info[0] == 0xE1: # if go up data on Arduino3 appear first
+                  detail = serialNo[i].read(7)
+                  info += detail
+                  serialMap[2] = serialNo[i]
+                  if(not serialStatus[2]):
+                     print("Serial No: 3 Port:",serialMap[2].port,"is online")
+                  serialStatus[2] = True
+##                  serialMapped[i] = True
+                  serialName[2] = serialMap[2].port
+                  # try to write to client
+         except serial.serialutil.SerialException:
+            print("Serial Error Occur, Port: ",i)
+            name = '/dev/ttyUSB'+str(i)
+            serialNo[i] = serialReconnect(name)
+      print(serialStatus[0],serialStatus[1],serialStatus[2],serialStatus[3])
+      time.sleep(1)
+      #if(serialStatus[0] and serialStatus[1] and serialStatus[2] and serialStatus[3]):
+      if(serialStatus[0] and serialStatus[1]):
+         print('All Arduino is ready')
+         break
+
    # Control Thread setup
    control = control.control_thread()
    control.daemon = False
