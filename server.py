@@ -192,15 +192,12 @@ class server_thread(threading.Thread):
    def run(self):
        while True:
            if not(len(storage.dataBuffer)==0):
-               for i in range(len(storage.dataBuffer)):
-                   print ("Command",i," : ",bytearray(storage.dataBuffer[i]))
-               del storage.dataBuffer[0]
-               time.sleep(2)
+               send()
 
 ########################### Main ############################
 if __name__ == "__main__":
    # serial mapping before main
-   # serialMapping()
+   serialMapping()
    # Control Thread setup
    control = control.control_thread()
    control.daemon = False
