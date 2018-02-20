@@ -55,5 +55,4 @@ def sink(depthSetPoint):
 
 def path():
     initialize()
-    sink(20)
     terminate()
