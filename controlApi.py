@@ -23,7 +23,7 @@ getDepthBtye = [0xFE]
 
 moveByte = [0xB1] # short angle + byte magnitude [4 bytes] (angle: From -180 to 180 degree , magnitude : 0 - 255)
 
-setYawBtye = [0xB3]
+setYawByte = [0xB3]
 
 setYawPidOnByte = [0xB7]
 
