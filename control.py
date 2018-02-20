@@ -10,15 +10,15 @@ class control_thread(threading.Thread):
 
     def run(self):
        path()
-       time.sleep(30)
+       time.sleep(10)
 
 def infoUpdate():
     api.calDepth()
     api.getDepth()
+    api.getYaw()
     api.getPitchRoll()
     api.getThruster2()
     api.getThruster4()
-    api.getYaw()
     api.getYawValue()
 
 def terminate():
@@ -37,7 +37,7 @@ def sink(depthSetPoint):
     api.getDepth()
     api.setDepthPidOn(1)
     tempDepth = storage.depth
-    for i in range(int(depthSetPoint/20))
+    for i in range(int(depthSetPoint/20)):
         api.setDepth(tempDepth+20)
         time.sleep(1)
 
@@ -55,4 +55,5 @@ def sink(depthSetPoint):
 
 def path():
     initialize()
+    sink(20)
     terminate()

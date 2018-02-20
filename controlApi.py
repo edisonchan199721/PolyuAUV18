@@ -72,7 +72,6 @@ def calDepth():
 
 def getPitchRoll():
     storage.dataBuffer.append(getPitchRollBtye)
-    storage.dataBuffer.append(getPitchRollBtye)
 
 def getDepth():
     storage.dataBuffer.append(getDepthBtye)

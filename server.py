@@ -48,21 +48,18 @@ def serialDisable(sNum,portName):
 # Send command to corresponding arduino
 def send():
     writeTo = -1
-    while not (len(dataBuffer)==0):
+    while not (len(storage.dataBuffer)==0):
         try:
-            if(dataBuffer[0][0] in controlApi.sendToArduino0):
+            if(storage.dataBuffer[0][0] in controlApi.sendToArduino0):
                 writeTo = 0
-                serialMap[writeTo].write(bytes(dataBuffer[0]))
-
-            elif(dataBuffer[0][0] in controlApi.sendToArduino1):
+                serialMap[writeTo].write(bytes(storage.dataBuffer[0]))
+            elif(storage.dataBuffer[0][0] in controlApi.sendToArduino1):
                 writeTo = 1
-                serialMap[writeTo].write(bytes(dataBuffer[0]))
-
-            if(dataBuffer[0][0] >= 240):
+                serialMap[writeTo].write(bytes(storage.dataBuffer[0]))           
+            if(storage.dataBuffer[0][0] >= 240):
                 receive(writeTo)
             else:
-                del dataBuffer[0]
-
+                del storage.dataBuffer[0]
         except serial.serialutil.SerialException:
             if (writeTo != -1):
                 print("Serial ",writeTo," Port:",server.serialName[writeTo]," is disconnected")
@@ -74,8 +71,8 @@ def send():
 def receive(receivedFrom):
     # Serial Read loop
     received = False
-    while not (received):
-        serialTemp = serialMap[receivedFrom] # Temp for current Arduino
+    serialTemp = serialMap[receivedFrom] # Temp for current Arduino
+    while not (received):      
         try:
            otherPort = -1
            otherPortName = ''
@@ -92,10 +89,15 @@ def receive(receivedFrom):
                     if(serialName[sNum] != serialMap[sNum].port):
                        otherPort = sNum
                        otherPortName = serialName[sNum]
-                    server.serialName[sNum] = serialMap[sNum].port
-                    if(not server.serialStatus[sNum]):
+                    serialName[sNum] = serialMap[sNum].port
+                    if(not serialStatus[sNum]):
                        print("Serial No:",sNum+1," Port:",serialMap[sNum].port,"is online")
-                    server.serialStatus[sNum] = True
+                    serialStatus[sNum] = True
+              elif info[0] == 0xE2: # Arduino 1
+                 storage.pitch = struct.unpack('h',serialTemp.read(2))[0]
+                 storage.roll = struct.unpack('h',serialTemp.read(2))[0]
+                 print('Pitch:',storage.pitch,'Roll:', storage.roll)
+                 received = True
               elif info[0] == 0xE3: # Arduino 1
                  storage.motor[0] = struct.unpack('h',serialTemp.read(2))[0]
                  storage.motor[1] = struct.unpack('h',serialTemp.read(2))[0]
@@ -104,7 +106,6 @@ def receive(receivedFrom):
                  received = True
               elif info[0] == 0xE4: # Arduino 2
                  storage.yaw = struct.unpack('h',serialTemp.read(2))[0]
-                 a1Bool[1] = True
                  print('Yaw:',storage.yaw)
                  received = True
               elif info[0] == 0xE5: # Arduino 2
@@ -128,13 +129,17 @@ def receive(receivedFrom):
             serialTemp = serialReconnect(serialName[writeTo])
             serialTemp.write(command)
         serialDisable(otherPort,otherPortName)
-        if((serialTemp.inWaiting() >= 2) and received):
-            serialTemp.read(serialTemp.inWaiting())
-        elif((serialTemp.inWaiting() <= 2) and not received):
-            break
-        if((serialTemp.inWaiting() <= 2) and received):
+        if(received):
             serialTemp.read(serialTemp.inWaiting())
             del storage.dataBuffer[0]
+            break
+##        elif((serialTemp.inWaiting() <= 2) and not received):
+##            time.sleep(0.2)
+##            break
+##        elseif((serialTemp.inWaiting() <= 2) and received):
+##            serialTemp.read(serialTemp.inWaiting())
+##            del storage.dataBuffer[0]
+##            break
       # check serial status
 
 class server_thread(threading.Thread):
@@ -145,6 +150,7 @@ class server_thread(threading.Thread):
        while True:
            if not(len(storage.dataBuffer)==0):
                send()
+               time.sleep(1)
 
 ########################### Main ############################
 if __name__ == "__main__":
@@ -159,6 +165,8 @@ if __name__ == "__main__":
    serialNo[2] = serialReconnect('/dev/ttyUSB2')
    # serialNo[3] = serialReconnect('/dev/ttyUSB3')
    # serial mapping before main loop
+   for i in range(3):
+      serialNo[i].read(serialNo[i].inWaiting())
    while True:
       # for serial mapping
       serialNo[0].write(command)
@@ -200,7 +208,7 @@ if __name__ == "__main__":
             name = '/dev/ttyUSB'+str(i)
             serialNo[i] = serialReconnect(name)
       print(serialStatus[0],serialStatus[1],serialStatus[2],serialStatus[3])
-      time.sleep(1)
+      time.sleep(0.5)
       #if(serialStatus[0] and serialStatus[1] and serialStatus[2] and serialStatus[3]):
       if(serialStatus[0] and serialStatus[1]):
          print('All Arduino is ready')
