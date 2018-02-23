@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-img = cv2.imread('main_replastering.jpg')
+img = cv2.imread('gate2.jpg')
 
 def draw_image_histogram(image, channels, color='k'):
     hist = cv2.calcHist([image], channels, None, [256], [0, 256])
@@ -70,6 +70,7 @@ def show_hsv_equalized(image):
     eq_image = cv2.cvtColor(cv2.merge([H, S, eq_V]), cv2.COLOR_HSV2RGB)
     plt.imshow(eq_image)
     plt.show()
+
 show_hsv_equalized(img)
 
 img_y_cr_cb = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)
@@ -82,7 +83,7 @@ img_y_cr_cb_eq = cv2.merge((y_eq, cr, cb))
 img_rgb_eq = cv2.cvtColor(img_y_cr_cb_eq, cv2.COLOR_YCR_CB2BGR)
 vis = np.concatenate((img, img_rgb_eq), axis=1)
 cv2.imwrite('out.png', vis)
-cv2.imshow('image',img_rgb_eq)
+cv2.imshow('image',img_y_cr_cb_eq)
 cv2.waitKey(0)
 
 # hist,bins = np.histogram(img.flatten(),256,[0,256])

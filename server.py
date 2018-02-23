@@ -55,7 +55,7 @@ def send():
                 serialMap[writeTo].write(bytes(storage.dataBuffer[0]))
             elif(storage.dataBuffer[0][0] in controlApi.sendToArduino1):
                 writeTo = 1
-                serialMap[writeTo].write(bytes(storage.dataBuffer[0]))           
+                serialMap[writeTo].write(bytes(storage.dataBuffer[0]))
             if(storage.dataBuffer[0][0] >= 240):
                 receive(writeTo)
             else:
@@ -72,7 +72,7 @@ def receive(receivedFrom):
     # Serial Read loop
     received = False
     serialTemp = serialMap[receivedFrom] # Temp for current Arduino
-    while not (received):      
+    while not (received):
         try:
            otherPort = -1
            otherPortName = ''
@@ -147,10 +147,9 @@ class server_thread(threading.Thread):
       threading.Thread.__init__ (self)
 
    def run(self):
-       while True:
-           if not(len(storage.dataBuffer)==0):
+       while not storage.end:
+           while not(len(storage.dataBuffer)==0):
                send()
-               time.sleep(1)
 
 ########################### Main ############################
 if __name__ == "__main__":
@@ -216,12 +215,18 @@ if __name__ == "__main__":
 
    # Control Thread setup
    control = control.control_thread()
-   control.daemon = False
+   control.daemon = True
    control.start()
    # Server Thread setup
    server = server_thread()
    server.daemon = True
    server.start()
+
+   control.join()
+   print("Control join")
+   server.join()
+   print("Server join")
+
    # Camera Thread setup
    # camera = camera.control_thread()
    # camera.daemon = True

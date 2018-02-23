@@ -40,7 +40,7 @@ def move(angle,magnitude):
     command = []
     command += moveByte
     command += struct.pack('h',int(angle))
-    command += struct.pack('b',int(magnitude))
+    command += struct.pack('B',int(magnitude))
     storage.dataBuffer.append(command[0:4])
 
 def setDepth(depth):
@@ -52,7 +52,7 @@ def setDepth(depth):
 def setPitch(pitch):
     command = []
     command += setPitchByte
-    command += struct.pack('b',int(pitch))
+    command += struct.pack('B',int(pitch+128))
     storage.dataBuffer.append(command[0:2])
 
 def setDepthPidOn(depthPidIsOn):
