@@ -129,9 +129,9 @@ def receive(receivedFrom):
                  storage.yawSetPoint = struct.unpack('h',serialTemp.read(2))[0]
                  print('Yaw set point:',storage.yawSetPoint)
                  received = True
-              elif info[0] == 0xC1:
-                 storage.voltage = struct.unpack('f',serialTemp.read(4))[0]
-                 storage.current = struct.unpack('f',serialTemp.read(4))[0]
+             elif info[0] == 0xEA:
+                 storage.voltage = float("{0:.2f}".format(struct.unpack('f',serialTemp.read(4))[0])
+                 storage.current = float("{0:.2f}".format(struct.unpack('f',serialTemp.read(4))[0])
                  print('Voltage:',storage.voltage,'Current:',storage.current)
                  received = True
         except serial.serialutil.SerialException:
