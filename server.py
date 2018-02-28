@@ -56,6 +56,9 @@ def send():
             elif(storage.dataBuffer[0][0] in controlApi.sendToArduino1):
                 writeTo = 1
                 serialMap[writeTo].write(bytes(storage.dataBuffer[0]))
+            elif(storage.dataBuffer[0][0] in controlApi.sendToArduino2):
+                writeTo = 2
+                serialMap[writeTo].write(bytes(storage.dataBuffer[0]))
             if(storage.dataBuffer[0][0] >= 240):
                 receive(writeTo)
             else:
@@ -123,6 +126,11 @@ def receive(receivedFrom):
               elif info[0] == 0xE7: # Arduino 1
                  storage.yawSetPoint = struct.unpack('h',serialTemp.read(2))[0]
                  print('Yaw set point:',storage.yawSetPoint)
+                 received = True
+              elif info[0] == 0xC1:
+                 storage.voltage = struct.unpack('f',serialTemp.read(4))[0]
+                 storage.current = struct.unpack('f',serialTemp.read(4))[0]
+                 print('Voltage:',storage.voltage,'Current:',storage.current)
                  received = True
         except serial.serialutil.SerialException:
             print("Serial Error Occur, Port: ",writeTo)
@@ -209,7 +217,7 @@ if __name__ == "__main__":
       print(serialStatus[0],serialStatus[1],serialStatus[2],serialStatus[3])
       time.sleep(0.5)
       #if(serialStatus[0] and serialStatus[1] and serialStatus[2] and serialStatus[3]):
-      if(serialStatus[0] and serialStatus[1]):
+      if(serialStatus[0] and serialStatus[1] and serialStatus[2]):
          print('All Arduino is ready')
          break
 

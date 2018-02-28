@@ -33,8 +33,15 @@ getThruster4Byte = [0xFD]
 
 getYawValueBtye = [0xFF]
 
+# Arduino no.2
+
+getPowerByte = [0xC1]
+
+setMagByte = [0xC2]
+
 sendToArduino0 = [0xA1,0xA3,0xAB,0xAC,0xAD,0xFA,0xFB,0xFE]
 sendToArduino1 = [0xB1,0xB3,0xB7,0xFC,0xFD,0xFF]
+sendToArduino2 = [0xC1,0xC2]
 
 def move(angle,magnitude):
     command = []
@@ -99,3 +106,9 @@ def getThruster4():
 
 def getYawValue():
     storage.dataBuffer.append(getYawValueBtye)
+
+def getPower():
+    storage.dataBuffer.append(getPowerBtye)
+
+def setMag():
+    storage.dataBuffer.append(setMagBtye)

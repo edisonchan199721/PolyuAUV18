@@ -18,6 +18,8 @@ yawSetPoint = 0
 initialYaw = 0
 initialDepth = 0
 initialPitch = 0
+voltage = 0
+current = 0
 
 stage = [False,False,False,False] # representing stage 1, 2, 3, 4
 
@@ -28,7 +30,7 @@ dataBuffer = [] # Data buffer that sending to arduino
 end = False # end of the whole program
 
 def reset():
-    global motorValue, motor, depth, yaw, pitch, roll, pitchPid, yawPid, yawSetPoint, stage, dataBuffer, initialYaw, initialDepth, initialPitch
+    global motorValue, motor, depth, yaw, pitch, roll, pitchPid, yawPid, yawSetPoint, stage, dataBuffer, initialYaw, initialDepth, initialPitch, voltage, current
     motorValue = [False,False]
     motor = [0,0,0,0,0,0]
     depth = 0
@@ -43,6 +45,8 @@ def reset():
     initialPitch = 0
     stage = [False,False,False,False]
     dataBuffer = []
+    voltage = 0
+    current = 0
 
 def initialVariable():
     global depth, yaw, pitch, initialYaw, initialDepth, initialPitch
