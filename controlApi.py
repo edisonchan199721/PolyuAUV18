@@ -13,11 +13,11 @@ calDepthByte = [0xAC]
 
 setPitchPidOnByte = [0xAD]
 
-getPitchRollBtye = [0xFA]
+getPitchRollByte = [0xFA]
 
 getThruster2Byte = [0xFB]
 
-getDepthBtye = [0xFE]
+getDepthByte = [0xFE]
 
 # Arduino no.1
 
@@ -31,7 +31,7 @@ getYawByte = [0xFC]
 
 getThruster4Byte = [0xFD]
 
-getYawValueBtye = [0xFF]
+getYawValueByte = [0xFF]
 
 # Arduino no.2
 
@@ -78,10 +78,10 @@ def calDepth():
     storage.dataBuffer.append(calDepthByte)
 
 def getPitchRoll():
-    storage.dataBuffer.append(getPitchRollBtye)
+    storage.dataBuffer.append(getPitchRollByte)
 
 def getDepth():
-    storage.dataBuffer.append(getDepthBtye)
+    storage.dataBuffer.append(getDepthByte)
 
 def getThruster2():
     storage.dataBuffer.append(getThruster2Byte)
@@ -105,10 +105,10 @@ def getThruster4():
     storage.dataBuffer.append(getThruster4Byte)
 
 def getYawValue():
-    storage.dataBuffer.append(getYawValueBtye)
+    storage.dataBuffer.append(getYawValueByte)
 
 def getPower():
-    storage.dataBuffer.append(getPowerBtye)
+    storage.dataBuffer.append(getPowerByte)
 
 def setMag():
-    storage.dataBuffer.append(setMagBtye)
+    storage.dataBuffer.append(setMagByte)

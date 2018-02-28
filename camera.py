@@ -23,4 +23,10 @@ def photoCapture():
         time.sleep(2)
         for filename in camera.capture_continuous('img{counter:03d}.jpg'):
             print('Captured %s' % filename)
-            time.sleep(2)
+            time.sleep(0.5)
+
+if __name__ == "__main__":
+    cameraThread = camera_thread()
+    cameraThread.daemon = True
+    cameraThread.start()
+    time.sleep(60)

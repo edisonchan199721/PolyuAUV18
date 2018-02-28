@@ -5,6 +5,7 @@ import time
 import controlApi as controlApi
 import control as control
 import storage as storage
+import sys
 
 # for serial mapping
 serialMap = [serial.Serial(),serial.Serial(),serial.Serial(),serial.Serial()]
@@ -59,7 +60,8 @@ def send():
             elif(storage.dataBuffer[0][0] in controlApi.sendToArduino2):
                 writeTo = 2
                 serialMap[writeTo].write(bytes(storage.dataBuffer[0]))
-            if(storage.dataBuffer[0][0] >= 240):
+                print("Write to arduino 2")
+            if(storage.dataBuffer[0][0] >= 192):
                 receive(writeTo)
             else:
                 del storage.dataBuffer[0]
@@ -234,7 +236,7 @@ if __name__ == "__main__":
    print("Control join")
    server.join()
    print("Server join")
-
+   sys.exit()
    # Camera Thread setup
    # camera = camera.control_thread()
    # camera.daemon = True
