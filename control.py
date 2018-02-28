@@ -114,3 +114,8 @@ def dryTest():
     terminate()
     dataLog.stop()
     dataLog.join()
+
+def directionTest():
+    storage.reset()
+    api.move(0,0)
+    terminate()
