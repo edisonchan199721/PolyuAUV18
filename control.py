@@ -13,7 +13,7 @@ class control_thread(threading.Thread):
       threading.Thread.__init__ (self)
 
     def run(self):
-       path()
+       dryTest()
        #time.sleep(15)
 
 class dataLog_thread(threading.Thread):
@@ -104,3 +104,18 @@ def path():
     terminate()
     dataLog.stop()
     dataLog.join()
+
+def dryTest():
+    storage.reset()
+    dataLog = dataLog_thread()
+    dataLog.daemon = True
+    dataLog.start()
+    time.sleep(20)
+    terminate()
+    dataLog.stop()
+    dataLog.join()
+
+def directionTest():
+    storage.reset()
+    api.move(0,0)
+    terminate()
