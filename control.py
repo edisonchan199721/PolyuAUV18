@@ -13,7 +13,7 @@ class control_thread(threading.Thread):
       threading.Thread.__init__ (self)
 
     def run(self):
-       dryTest()
+       lightTest()
        #time.sleep(15)
 
 class dataLog_thread(threading.Thread):
@@ -57,6 +57,8 @@ def terminate():
     api.setPitchPidOn(0)
     api.setYawPidOn(0)
     storage.end = True
+    api.move(0,0)
+    print('Termainate now')
 
 def initialize():
     print('Initialize now')
@@ -65,10 +67,11 @@ def initialize():
     api.calDepth()
     infoUpdate()
     storage.initialVariable()
+    time.sleep(1)
     api.setYaw(storage.initialYaw)
     api.setYawPidOn(1)
-    api.setPitch(storage.initialPitch)
-    api.setPitchPidOn(1)
+##    api.setPitch(storage.initialPitch)
+##    api.setPitchPidOn(1)
 
 def sink(depthSetPoint):
     api.getDepth()
@@ -112,7 +115,6 @@ def dryTest():
     dataLog.daemon = True
     dataLog.start()
     time.sleep(10)
-    print('Termainate now')
     terminate()
     dataLog.stop()
     dataLog.join()
@@ -125,6 +127,23 @@ def directionTest():
 def lightTest():
     storage.reset()
     api.setMag(1)
-    time.sleep(5)
+    time.sleep(60)
     api.setMag(0)
     terminate()
+
+def test():
+    storage.reset()
+    initialize()
+    dataLog = dataLog_thread()
+    dataLog.daemon = True
+    dataLog.start()
+    ##############
+##    api.move(0,60)
+##    time.sleep(5)
+##    api.move(180,60)
+##    time.sleep(5)
+    time.sleep(20)
+    ###############
+    terminate()
+    dataLog.stop()
+    dataLog.join()

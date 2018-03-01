@@ -11,6 +11,7 @@ class PiVideoStream:
 		self.camera = PiCamera()
 		self.camera.resolution = resolution
 		self.camera.framerate = framerate
+		self.camera.shutter_speed = 100000
 		self.rawCapture = PiRGBArray(self.camera, size=resolution)
 		self.stream = self.camera.capture_continuous(self.rawCapture,
 			format="bgr", use_video_port=True)
@@ -56,10 +57,10 @@ time.sleep(2)
 while True:
     image = vs.read()
     cv2.imshow("raw", image)
-    key = cv2.waitKey(1) & 0xFF
+    key = cv2.waitKey(0) & 0xFF
         # clear the stream in preparation for the next frame
         # if the `q` key was pressed, break from the loop
-    if key == ord("q"):                
+    if key == ord('q'):                
         break
         
 cv2.destroyAllWindows()

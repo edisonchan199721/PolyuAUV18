@@ -60,11 +60,10 @@ def send():
             elif(storage.dataBuffer[0][0] in controlApi.sendToArduino2):
                 writeTo = 2
                 serialMap[writeTo].write(bytes(storage.dataBuffer[0]))
-                print("Write to arduino 2")
-            if(storage.dataBuffer[0][0] >= 192):
+            if(storage.dataBuffer[0][0] >= 224):
                 receive(writeTo)
             else:
-                del storage.dataBuffer[0]
+                del storage.dataBuffer[0]   
         except serial.serialutil.SerialException:
             if (writeTo != -1):
                 print("Serial ",writeTo," Port:",server.serialName[writeTo]," is disconnected")
@@ -129,9 +128,9 @@ def receive(receivedFrom):
                  storage.yawSetPoint = struct.unpack('h',serialTemp.read(2))[0]
                  print('Yaw set point:',storage.yawSetPoint)
                  received = True
-             elif info[0] == 0xEA:
-                 storage.voltage = float("{0:.2f}".format(struct.unpack('f',serialTemp.read(4))[0])
-                 storage.current = float("{0:.2f}".format(struct.unpack('f',serialTemp.read(4))[0])
+              elif info[0] == 0xEA:
+                 storage.voltage = float("{0:.2f}".format(struct.unpack('f',serialTemp.read(4))[0]))
+                 storage.current = float("{0:.2f}".format(struct.unpack('f',serialTemp.read(4))[0]))
                  print('Voltage:',storage.voltage,'Current:',storage.current)
                  received = True
         except serial.serialutil.SerialException:
@@ -236,7 +235,7 @@ if __name__ == "__main__":
    print("Control join")
    server.join()
    print("Server join")
-   sys.exit()
+   sys.exit("Now exit")
    # Camera Thread setup
    # camera = camera.control_thread()
    # camera.daemon = True
