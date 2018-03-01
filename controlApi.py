@@ -110,5 +110,8 @@ def getYawValue():
 def getPower():
     storage.dataBuffer.append(getPowerByte)
 
-def setMag():
-    storage.dataBuffer.append(setMagByte)
+def setMag(magIsOn):
+    command = []
+    command += setMagByte
+    command += struct.pack('b',int(magIsOn))
+    storage.dataBuffer.append(command[0:2])

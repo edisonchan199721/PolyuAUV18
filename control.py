@@ -121,3 +121,10 @@ def directionTest():
     storage.reset()
     api.move(0,0)
     terminate()
+
+def lightTest():
+    storage.reset()
+    api.setMag(1)
+    time.sleep(5)
+    api.setMag(0)
+    terminate()
