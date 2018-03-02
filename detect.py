@@ -37,8 +37,6 @@ def get_extreme_red_points(image, show_result = False):
         (x, y), (MA, ma), angle = cv2.fitEllipse(cx)
         if (not ((angle < 45) or (angle > 135))) or (cv2.arcLength(cx, True) < 0):
             del contours_red[-1]
-            print (cv2.arcLength(cx, True))
-            print (angle)
         else:
             c = cx
             break
@@ -134,7 +132,7 @@ def get_extreme_yellow_points(image, show_result = False):
 
     # mask
     mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
-    #mask_green += cv2.inRange(hsv, lower_grey, upper_grey)
+    #mask_yellow += cv2.inRange(hsv, lower_grey, upper_grey)
 
     extreme_points_yellow = None
 
@@ -166,7 +164,7 @@ def get_extreme_yellow_points(image, show_result = False):
         extreme_points_yellow = [tuple(c[c[:, :, 0].argmin()][0]), tuple(c[c[:, :, 0].argmax()][0])
             , tuple(c[c[:, :, 1].argmin()][0]), tuple(c[c[:, :, 1].argmax()][0])]
     except:
-        print ('No green')
+        print ('No yellow')
 
     if show_result:
         print (extreme_points_yellow)
@@ -180,28 +178,50 @@ def get_extreme_yellow_points(image, show_result = False):
         cv2.destroyAllWindows()
     return extreme_points_yellow
 
-def location_calculation(extreme_points_red, extreme_points_green):
-    length_red, length_green = 0, 0
+def gate_location_calculation(extreme_points_red, extreme_points_green):
+    # Return None if no yellow detected, else return (DistanceToYellow, AngleToYellow)
+    red_angle, green_angle, red_distance, green_distance = None, None, None, None
     if extreme_points_red is not None:
-        length_red = int(math.sqrt((extreme_points_red[2][0]-extreme_points_red[3][0])**2+(extreme_points_red[2][1]-extreme_points_red[3][1])**2))
+        red_distance = int(math.sqrt((extreme_points_red[2][0]-extreme_points_red[3][0])**2+(extreme_points_red[2][1]-extreme_points_red[3][1])**2))
+        red_distance = 100/red_distance # or what ever measured real pixel at 1 m
+        #assume 100 pixels at 1m, 10 pixels mean same object at 10m
+        red_mid_point = int((extreme_points_yellow[2][0]+extreme_points_yellow[3][0])/2)
+        if red_mid_point <= 640:
+            red_mid_point = 640 - red_mid_point
+        else:
+            red_mid_point = red_mid_point - 640
+        red_angle = int(red_mid_point/640*60)
     if extreme_points_green is not None:
-        length_green = int(math.sqrt((extreme_points_green[2][0]-extreme_points_green[3][0])**2+(extreme_points_green[2][1]-extreme_points_green[3][1])**2))
-    # Compare both length, take the longer one, the length will likely be shorten due to incorrect recognition
-    length = max(length_red, length_green)
+        green_distance = int(math.sqrt((extreme_points_green[2][0]-extreme_points_green[3][0])**2+(extreme_points_green[2][1]-extreme_points_green[3][1])**2))
+        green_distance = 100/green_distance # or what ever measured real pixel at 1 m
+        #assume 100 pixels at 1m, 10 pixels mean same object at 10m
+        green_mid_point = int((extreme_points_green[2][0]+extreme_points_green[3][0])/2)
+        if green_mid_point <= 640:
+            green_mid_point = 640 - green_mid_point
+        else:
+            green_mid_point = green_mid_point - 640
+        green_angle = int(green_mid_point/640*60)
+    deviation = None
+    if (red_angle is not None) and (green_angle is not None):
+        deviation = (abs(red_angle-green_angle)>20) and (red_distance > 2) and (green_distance > 2)
+        deviation = deviation or (abs(red_distance-green_distance)>2)
+    return deviation, (red_distance, red_angle) , (green_distance, green_angle)
 
-
-def location_calculation(extreme_points_yellow):
-    yellow_distance, yellow_angle = 0, 0
+def flare_location_calculation(extreme_points_yellow):
+    # Return None if no yellow detected, else return (DistanceToYellow, AngleToYellow)
     if extreme_points_yellow is not None:
         yellow_distance = int(math.sqrt((extreme_points_yellow[2][0]-extreme_points_yellow[3][0])**2+(extreme_points_yellow[2][1]-extreme_points_yellow[3][1])**2))
         yellow_distance = 100/yellow_distance # or what ever measured real pixel at 1 m
         #assume 100 pixels at 1m, 10 pixels mean same object at 10m
-        yellow_mid_point = (int((extreme_points_yellow[2][0]+extreme_points_yellow[3][0])/2), int((extreme_points_yellow[2][1]+extreme_points_yellow[3][1])/2))
-
-
+        yellow_mid_point = int((extreme_points_yellow[2][0]+extreme_points_yellow[3][0])/2)#, int((extreme_points_yellow[2][1]+extreme_points_yellow[3][1])/2))
+        if yellow_mid_point <= 640:
+            yellow_mid_point = 640 - yellow_mid_point
+        else:
+            yellow_mid_point = yellow_mid_point - 640
+        return yellow_distance, int(yellow_mid_point/640*60)
+    return None
 
 if __name__ == "__main__":
     frame = cv2.imread('test1.5m2.jpg')
     frame = cv2.imread('test12_cr.jpg')
-    distance_calculation(get_extreme_red_points(frame))
-    get_extreme_green_points(frame)
+    gate_location_calculation(get_extreme_red_points(frame))
