@@ -22,11 +22,11 @@ class dataLog_thread(threading.Thread):
         threading.Thread.__init__ (self)
         self.counter = 0
         self.end = False
-        self.rate = 0.5
+        self.rate = 2
 
     def run(self):
         csvfile = open('data.csv', 'a')
-        fieldnames = ['Time','Depth','Yaw','Pitch','Roll','Motor 0','Motor 1','Motor 2','Motor 3','Motor 4','Motor 5','Voltage','Current','depth_Kp', 'depth_Ki', 'depth_Kd', 'pitch_Kp', 'pitch_Ki', 'pitch_Kd']
+        fieldnames = ['Time','Depth','Yaw','Pitch','Roll','Motor 0','Motor 1','Motor 2','Motor 3','Motor 4','Motor 5','Voltage','Current','depth_Kp', 'depth_Ki', 'depth_Kd', 'pitch_Kp', 'pitch_Ki', 'pitch_Kd','depth_Pid','yaw_Pid','pitch_Pid']
         writer = csv.writer(csvfile, delimiter=',',lineterminator='\n')
         writer.writerow([str(datetime.now().date()),str(datetime.now().time().strftime('%H:%M:%S'))])
         writer.writerow(fieldnames)
@@ -35,7 +35,7 @@ class dataLog_thread(threading.Thread):
             with open('data.csv', 'a') as csvfile:
                 writer = csv.writer(csvfile, delimiter=',',lineterminator='\n')
                 time.sleep(self.rate)
-                writer.writerow([float("{0:.1f}".format(self.counter*self.rate)),storage.depth,storage.yaw,storage.pitch,storage.roll,storage.motor[0],storage.motor[1],storage.motor[2],storage.motor[3],storage.motor[4],storage.motor[5],storage.voltage,storage.current,storage.depth_Kp,storage.depth_Ki,storage.depth_Kd,storage.pitch_Kp,storage.pitch_Ki,storage.pitch_Kd])
+                writer.writerow([float("{0:.1f}".format(self.counter*self.rate)),storage.depth,storage.yaw,storage.pitch,storage.roll,storage.motor[0],storage.motor[1],storage.motor[2],storage.motor[3],storage.motor[4],storage.motor[5],storage.voltage,storage.current,storage.depth_Kp,storage.depth_Ki,storage.depth_Kd,storage.pitch_Kp,storage.pitch_Ki,storage.pitch_Kd,storage.depthPid,storage.yawPid,storage.pitchPid])
                 infoUpdate()
                 self.counter+=1
 
@@ -50,6 +50,7 @@ def infoUpdate():
     api.getThruster4()
     api.getYawValue()
     api.getPower()
+    api.getDepthPitchPid()
 
 def terminate():
     api.move(0,0)
@@ -111,17 +112,18 @@ def path():
     print('Termainate now')
     dataLog.stop()
     dataLog.join()
+    print("datalog join")
 
 def dryTest():
-    time.sleep(10)
+##    time.sleep(10)
     storage.reset()
     dataLog = dataLog_thread()
     dataLog.daemon = True
     dataLog.start()
-    initialize(True,True)
-    time.sleep(20)
-    api.setPitchPidOn(0)
-    api.setYawPidOn(0)
+    initialize()
+    time.sleep(10)
+##    api.setPitchPidOn(0)
+##    api.setYawPidOn(0)
     dataLog.stop()
     dataLog.join()
 

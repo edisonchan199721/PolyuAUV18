@@ -99,6 +99,7 @@ def getThruster2():
 
 def getDepthPitchPid():
     storage.dataBuffer.append(getDepthPitchPidByte)
+    
 def setYaw(angle):
     command = []
     command += setYawByte
