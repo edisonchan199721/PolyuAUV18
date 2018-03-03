@@ -21,6 +21,10 @@ getDepthByte = [0xFE]
 
 getDepthPitchPidByte = [0xF4]
 
+setDepthPidByte = [0xA7]
+
+setPitchPidByte = [0xA9]
+
 # Arduino no.1
 
 moveByte = [0xB1] # short angle + byte magnitude [4 bytes] (angle: From -180 to 180 degree , magnitude : 0 - 255)
@@ -99,7 +103,25 @@ def getThruster2():
 
 def getDepthPitchPid():
     storage.dataBuffer.append(getDepthPitchPidByte)
-    
+
+def setDepthPid(depth_Kp,depth_Ki,depth_Kd):
+    command = []
+    command += setDepthPidByte
+    command += struct.pack('f',int(depth_Kp))
+    command += struct.pack('f',int(depth_Ki))
+    command += struct.pack('f',int(depth_Kd))
+    storage.dataBuffer.append(command[0:13])
+
+def setPitchPid(pitch_Kp,pitch_Ki,pitch_Kd):
+    command = []
+    command += setPitchPidByte
+    command += struct.pack('f',int(pitch_Kp))
+    command += struct.pack('f',int(pitch_Ki))
+    command += struct.pack('f',int(pitch_Kd))
+    storage.dataBuffer.append(command[0:13])
+
+###########Arduino 1############
+
 def setYaw(angle):
     command = []
     command += setYawByte

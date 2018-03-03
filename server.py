@@ -60,7 +60,7 @@ def send():
             elif(storage.dataBuffer[0][0] in controlApi.sendToArduino2):
                 writeTo = 2
                 serialMap[writeTo].write(bytes(storage.dataBuffer[0]))
-            if(storage.dataBuffer[0][0] >= 224):
+            if(storage.dataBuffer[0][0] >= 224 or storage.dataBuffer[0][0]==[0xA7]or storage.dataBuffer[0][0]==[0xA9]):
                 receive(writeTo)
             else:
                 del storage.dataBuffer[0]
@@ -143,6 +143,16 @@ def receive(receivedFrom):
                  storage.pitch_Kd = struct.unpack('f',serialTemp.read(4))[0]
                  print('Depth P:',storage.depth_Kp,'Depth I:',storage.depth_Ki,'Depth D:',storage.depth_Kd,'Pitch P:',storage.pitch_Kp,'Pitch I:',storage.pitch_Ki,'Pitch D:',storage.pitch_Kd,)
                  received = True
+              elif info[0] == 0xF7:
+                 storage.depth_Kp = struct.unpack('f',serialTemp.read(4))[0]
+                 storage.depth_Ki = struct.unpack('f',serialTemp.read(4))[0]
+                 storage.depth_Kd = struct.unpack('f',serialTemp.read(4))[0]
+                 print('Depth P:',storage.depth_Kp,'Depth I:',storage.depth_Ki,'Depth D:',storage.depth_Kd)
+              elif info[0] == 0xF9:
+                 storage.pitch_Kp = struct.unpack('f',serialTemp.read(4))[0]
+                 storage.pitch_Ki = struct.unpack('f',serialTemp.read(4))[0]
+                 storage.pitch_Kd = struct.unpack('f',serialTemp.read(4))[0]
+                 print('Pitch P:',storage.pitch_Kp,'Pitch I:',storage.pitch_Ki,'Pitch D:',storage.pitch_Kd,)
         except serial.serialutil.SerialException:
             print("Serial Error Occur, Port: ",writeTo)
             serialTemp = serialReconnect(serialName[writeTo])

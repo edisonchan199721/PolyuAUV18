@@ -122,6 +122,8 @@ def dryTest():
     dataLog.start()
     initialize()
     time.sleep(10)
+    api.setDepthPid(5,0,0)
+    api.setPitchPid(5,0,0)
 ##    api.setPitchPidOn(0)
 ##    api.setYawPidOn(0)
     dataLog.stop()
