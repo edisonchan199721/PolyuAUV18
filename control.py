@@ -22,7 +22,7 @@ class dataLog_thread(threading.Thread):
         threading.Thread.__init__ (self)
         self.counter = 0
         self.end = False
-        self.rate = 2
+        self.rate = 0.1
 
     def run(self):
         csvfile = open('data.csv', 'a')
@@ -43,14 +43,14 @@ class dataLog_thread(threading.Thread):
         self.end = True
 
 def infoUpdate():
-    api.getDepth()
-    api.getYaw()
+##    api.getDepth()
+##    api.getYaw()
     api.getPitchRoll()
-    api.getThruster2()
-    api.getThruster4()
-    api.getYawValue()
-    api.getPower()
-    api.getDepthPitchPid()
+##    api.getThruster2()
+##    api.getThruster4()
+##    api.getYawValue()
+##    api.getPower()
+##    api.getDepthPitchPid()
 
 def terminate():
     api.move(0,0)
@@ -115,15 +115,19 @@ def path():
     print("datalog join")
 
 def dryTest():
-##    time.sleep(10)
     storage.reset()
     dataLog = dataLog_thread()
     dataLog.daemon = True
     dataLog.start()
-    initialize()
-    time.sleep(10)
     api.setDepthPid(5,0,0)
-    api.setPitchPid(5,0,0)
+    api.setPitchPid(6,0,50)
+    initialize(False,True)
+##    sink(30,5)
+##    time.sleep(5)
+##    api.move(0,250)
+##    time.sleep(3)
+##    api.move(180,250)
+    time.sleep(30)
 ##    api.setPitchPidOn(0)
 ##    api.setYawPidOn(0)
     dataLog.stop()
