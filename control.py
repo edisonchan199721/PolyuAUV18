@@ -14,7 +14,7 @@ class control_thread(threading.Thread):
 
     def run(self):
         time.sleep(1) #for setup waiting
-        path()
+        dryTest()
         terminate()
 
 class dataLog_thread(threading.Thread):
@@ -22,7 +22,7 @@ class dataLog_thread(threading.Thread):
         threading.Thread.__init__ (self)
         self.counter = 0
         self.end = False
-        self.rate = 1
+        self.rate = 0.5
 
     def run(self):
         csvfile = open('data.csv', 'a')
@@ -104,24 +104,24 @@ def path():
 ##    webCameraThread.daemon = True
 ##    webCameraThread.start()
     time.sleep(2)
-    sink(30,5)
+    sink(20,5)
     time.sleep(5)
 ##    api.move(0,120)
     time.sleep(10)
-    time.sleep(2)
     print('Termainate now')
     dataLog.stop()
     dataLog.join()
-    terminate()
 
 def dryTest():
+    time.sleep(10)
     storage.reset()
     dataLog = dataLog_thread()
     dataLog.daemon = True
     dataLog.start()
-    initialize(True,False)
-    api.move(0,200)
-    time.sleep(10)
+    initialize(True,True)
+    time.sleep(20)
+    api.setPitchPidOn(0)
+    api.setYawPidOn(0)
     dataLog.stop()
     dataLog.join()
 

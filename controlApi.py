@@ -68,9 +68,9 @@ def setDepthPidOn(depthPidIsOn):
     command += struct.pack('b',int(depthPidIsOn))
     storage.dataBuffer.append(command[0:2])
     if (depthPidIsOn == 1):
-        storage.depthPid == True
+        storage.depthPid = True
     else:
-        storage.depthPid == False
+        storage.depthPid = False
 
 
 def setPitchPidOn(pitchPidIsOn):
@@ -79,9 +79,9 @@ def setPitchPidOn(pitchPidIsOn):
     command += struct.pack('b',int(pitchPidIsOn))
     storage.dataBuffer.append(command[0:2])
     if (pitchPidIsOn == 1):
-        storage.pitchPid == True
+        storage.pitchPid = True
     else:
-        storage.pitchPid == False
+        storage.pitchPid = False
 
 def calDepth():
     storage.dataBuffer.append(calDepthByte)
@@ -107,9 +107,9 @@ def setYawPidOn(yawPidIsOn):
     command += struct.pack('b',int(yawPidIsOn))
     storage.dataBuffer.append(command[0:2])
     if (yawPidIsOn == 1):
-        storage.yawPid == True
+        storage.yawPid = True
     else:
-        storage.yawPid == False
+        storage.yawPid = False
 
 def getYaw():
     storage.dataBuffer.append(getYawByte)
