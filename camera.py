@@ -28,6 +28,9 @@ class piCamera_thread(threading.Thread):
             camera.capture(rawCapture, format="bgr")
             image = rawCapture.array
             cv2.imshow("raw", image)
+            ###########################
+
+            ###########################
     ##        print(detect.get_extreme_red_points(image))
     ##        print('a')
 
@@ -47,6 +50,11 @@ class webCamera_thread(threading.Thread):
     def stop(self):
         self.end = True
 
+    def showInfoEvent(self, event, x, y, flags, param):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            print ("x:"x)
+            print ("y:"x)
+
     def videoShow(self):
         cap = cv2.VideoCapture(0)
         while(cap.isOpened() && not self.end):
@@ -55,6 +63,9 @@ class webCamera_thread(threading.Thread):
             # Our operations on the frame come here
             # Display the resulting frame
             cv2.imshow('frame',frame)
+            cv2.setMouseCallback('frame', showInfoEvent)
+            ###########################
+            ###########################
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 self.stop()
         # When everything done, release the capture
@@ -87,20 +98,25 @@ class webCamera_thread(threading.Thread):
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    camera = PiCamera()
-    camera.resolution = (640,480)
-    camera.framerate = 10
-    camera.shutter_speed = camera.exposure_speed
-    #camera.exposure_mode = 'off'
-    rawCapture = PiRGBArray(camera)
-    time.sleep(2)
-    while (True):
-        camera.capture(rawCapture, format="bgr")
-        image = rawCapture.array
-        cv2.imshow("raw", image)
-##        print(detect.get_extreme_red_points(image))
-##        print('a')
-        if cv2.waitKey(0) & 0xFF == ord('q'):
-            break
-        # clear the stream in preparation for the next frame
-        # if the `q` key was pressed, break from the loop
+#     camera = PiCamera()
+#     camera.resolution = (640,480)
+#     camera.framerate = 10
+#     camera.shutter_speed = camera.exposure_speed
+#     #camera.exposure_mode = 'off'
+#     rawCapture = PiRGBArray(camera)
+#     time.sleep(2)
+#     while (True):
+#         camera.capture(rawCapture, format="bgr")
+#         image = rawCapture.array
+#         cv2.imshow("raw", image)
+# ##        print(detect.get_extreme_red_points(image))
+# ##        print('a')
+#         if cv2.waitKey(0) & 0xFF == ord('q'):
+#             break
+#         # clear the stream in preparation for the next frame
+#         # if the `q` key was pressed, break from the loop
+    webCameraThread = camera.webCamera_thread()
+    webCameraThread.daemon = True
+    webCameraThread.start()
+    time.sleep(10)
+    
