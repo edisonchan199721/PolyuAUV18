@@ -5,7 +5,7 @@ import controlApi as api
 from datetime import datetime
 import time
 import csv
-# import camera as camera
+import camera as camera
 import sys
 
 class control_thread(threading.Thread):
@@ -13,8 +13,8 @@ class control_thread(threading.Thread):
         threading.Thread.__init__ (self)
 
     def run(self):
-        time.sleep(20) #for setup waiting
-        dryTest()
+        time.sleep(1) #for setup waiting
+        path()
         terminate()
 
 class dataLog_thread(threading.Thread):
@@ -96,26 +96,31 @@ def sink(depthSetPoint,sinkSpeed=10): #sinkSpeed is the sinking distance(cm) per
 # def stage4():
 
 def path():
-    time.sleep(30)
-    initialize()
+    initialize(True, True)
     dataLog = dataLog_thread()
     dataLog.daemon = True
     dataLog.start()
+##    webCameraThread = camera.webCamera_thread()
+##    webCameraThread.daemon = True
+##    webCameraThread.start()
     time.sleep(2)
     sink(30,5)
-    # webCameraThread = camera.webCamera_thread()
-    # webCameraThread.daemon = True
-    # webCameraThread.start()
+    time.sleep(5)
+##    api.move(0,120)
+    time.sleep(10)
     time.sleep(2)
     print('Termainate now')
     dataLog.stop()
     dataLog.join()
+    terminate()
 
 def dryTest():
     storage.reset()
     dataLog = dataLog_thread()
     dataLog.daemon = True
     dataLog.start()
+    initialize(True,False)
+    api.move(0,200)
     time.sleep(10)
     dataLog.stop()
     dataLog.join()
@@ -132,7 +137,7 @@ def lightTest():
 
 def test():
     storage.reset()
-    initialize()
+    initialize(True)
     dataLog = dataLog_thread()
     dataLog.daemon = True
     dataLog.start()
