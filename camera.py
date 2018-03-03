@@ -34,8 +34,6 @@ class piCamera_thread(threading.Thread):
     ##        print(detect.get_extreme_red_points(image))
     ##        print('a')
 
-    def
-
 class webCamera_thread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__ (self)
@@ -52,12 +50,12 @@ class webCamera_thread(threading.Thread):
 
     def showInfoEvent(self, event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONDOWN:
-            print ("x:"x)
-            print ("y:"x)
+            print ("x:",x)
+            print ("y:",x)
 
     def videoShow(self):
         cap = cv2.VideoCapture(0)
-        while(cap.isOpened() && not self.end):
+        while(cap.isOpened() and not self.end):
             # Capture frame-by-frame
             ret, frame = cap.read()
             # Our operations on the frame come here
@@ -115,8 +113,8 @@ if __name__ == "__main__":
 #             break
 #         # clear the stream in preparation for the next frame
 #         # if the `q` key was pressed, break from the loop
-    webCameraThread = camera.webCamera_thread()
+    webCameraThread = webCamera_thread()
     webCameraThread.daemon = True
     webCameraThread.start()
-    time.sleep(10)
+    time.sleep(20)
     
