@@ -133,6 +133,16 @@ def receive(receivedFrom):
                  storage.current = float("{0:.2f}".format(struct.unpack('f',serialTemp.read(4))[0]))
                  print('Voltage:',storage.voltage,'Current:',storage.current)
                  received = True
+              elif info[0] == 0xF7:
+                 storage.depth_Kp = struct.unpack('f',serialTemp.read(4))[0]
+                 storage.depth_Ki = struct.unpack('f',serialTemp.read(4))[0]
+                 storage.depth_Kd = struct.unpack('f',serialTemp.read(4))[0]
+                 pitchProtocol=serialTemp.read(1)
+                 storage.pitch_Kp = struct.unpack('f',serialTemp.read(4))[0]
+                 storage.pitch_Ki = struct.unpack('f',serialTemp.read(4))[0]
+                 storage.pitch_Kd = struct.unpack('f',serialTemp.read(4))[0]
+                 print('Depth P:',storage.depth_Kp,'Depth I:',storage.depth_Ki,'Depth D:',storage.depth_Kd,'Pitch P:',storage.pitch_Kp,'Pitch I:',storage.pitch_Ki,'Pitch D:',storage.pitch_Kd,)
+                 received = True
         except serial.serialutil.SerialException:
             print("Serial Error Occur, Port: ",writeTo)
             serialTemp = serialReconnect(serialName[writeTo])

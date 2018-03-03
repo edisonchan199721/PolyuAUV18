@@ -19,6 +19,8 @@ getThruster2Byte = [0xFB]
 
 getDepthByte = [0xFE]
 
+getDepthPitchPidByte = [0xF4]
+
 # Arduino no.1
 
 moveByte = [0xB1] # short angle + byte magnitude [4 bytes] (angle: From -180 to 180 degree , magnitude : 0 - 255)
@@ -39,7 +41,7 @@ getPowerByte = [0xEA]
 
 setMagByte = [0xC1]
 
-sendToArduino0 = [0xA1,0xA3,0xAB,0xAC,0xAD,0xFA,0xFB,0xFE]
+sendToArduino0 = [0xA1,0xA3,0xAB,0xAC,0xAD,0xF4,0xFA,0xFB,0xFE]
 sendToArduino1 = [0xB1,0xB3,0xB7,0xFC,0xFD,0xFF]
 sendToArduino2 = [0xEA,0xC1]
 
@@ -95,6 +97,8 @@ def getDepth():
 def getThruster2():
     storage.dataBuffer.append(getThruster2Byte)
 
+def getDepthPitchPid():
+    storage.dataBuffer.append(getDepthPitchPidByte)
 def setYaw(angle):
     command = []
     command += setYawByte

@@ -30,11 +30,20 @@ dataBuffer = [] # Data buffer that sending to arduino
 
 end = False # end of the whole program
 
+#PID Variable
+depth_Kp = 0
+depth_Ki = 0
+depth_Kd = 0
+pitch_Kp = 0
+pitch_Ki = 0
+pitch_Kd = 0
+
 #image processing
 
 
 def reset():
     global motorValue, motor, depth, yaw, pitch, roll, pitchPid, yawPid, yawSetPoint, stage, dataBuffer, initialYaw, initialDepth, initialPitch, voltage, current
+    global depth_Kp, depth_Ki, depth_Kd, pitch_Kp, pitch_Ki, pitch_Kd
     motorValue = [False,False]
     motor = [0,0,0,0,0,0]
     depth = 0
@@ -51,6 +60,12 @@ def reset():
     dataBuffer = []
     voltage = 0
     current = 0
+    depth_Kp = 0
+    depth_Ki = 0
+    depth_Kd = 0
+    pitch_Kp = 0
+    pitch_Ki = 0
+    pitch_Kd = 0
 
 def initialVariable():
     global depth, yaw, pitch, initialYaw, initialDepth, initialPitch

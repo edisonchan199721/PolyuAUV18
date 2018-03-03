@@ -26,7 +26,7 @@ class dataLog_thread(threading.Thread):
 
     def run(self):
         csvfile = open('data.csv', 'a')
-        fieldnames = ['Time','Depth','Yaw','Pitch','Roll','Motor 0','Motor 1','Motor 2','Motor 3','Motor 4','Motor 5','Voltage','Current']
+        fieldnames = ['Time','Depth','Yaw','Pitch','Roll','Motor 0','Motor 1','Motor 2','Motor 3','Motor 4','Motor 5','Voltage','Current','depth_Kp', 'depth_Ki', 'depth_Kd', 'pitch_Kp', 'pitch_Ki', 'pitch_Kd']
         writer = csv.writer(csvfile, delimiter=',',lineterminator='\n')
         writer.writerow([str(datetime.now().date()),str(datetime.now().time().strftime('%H:%M:%S'))])
         writer.writerow(fieldnames)
@@ -35,7 +35,7 @@ class dataLog_thread(threading.Thread):
             with open('data.csv', 'a') as csvfile:
                 writer = csv.writer(csvfile, delimiter=',',lineterminator='\n')
                 time.sleep(self.rate)
-                writer.writerow([float("{0:.1f}".format(self.counter*self.rate)),storage.depth,storage.yaw,storage.pitch,storage.roll,storage.motor[0],storage.motor[1],storage.motor[2],storage.motor[3],storage.motor[4],storage.motor[5],storage.voltage,storage.current])
+                writer.writerow([float("{0:.1f}".format(self.counter*self.rate)),storage.depth,storage.yaw,storage.pitch,storage.roll,storage.motor[0],storage.motor[1],storage.motor[2],storage.motor[3],storage.motor[4],storage.motor[5],storage.voltage,storage.current,storage.depth_Kp,storage.depth_Ki,storage.depth_Kd,storage.pitch_Kp,storage.pitch_Ki,storage.pitch_Kd])
                 infoUpdate()
                 self.counter+=1
 
