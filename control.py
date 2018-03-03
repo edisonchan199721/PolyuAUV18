@@ -10,18 +10,19 @@ import sys
 
 class control_thread(threading.Thread):
     def __init__(self):
-      threading.Thread.__init__ (self)
+        threading.Thread.__init__ (self)
 
     def run(self):
-       lightTest()
-       #time.sleep(15)
+        time.sleep(20) #for setup waiting
+        dryTest()
+        terminate()
 
 class dataLog_thread(threading.Thread):
     def __init__(self):
-      threading.Thread.__init__ (self)
-      self.counter = 0
-      self.end = False
-      self.rate = 1
+        threading.Thread.__init__ (self)
+        self.counter = 0
+        self.end = False
+        self.rate = 1
 
     def run(self):
         csvfile = open('data.csv', 'a')
@@ -60,7 +61,7 @@ def terminate():
     api.move(0,0)
     print('Termainate now')
 
-def initialize():
+def initialize(YawPidOn=False,PitchPidOn=False):
     print('Initialize now')
     storage.reset()
     api.move(0,0)
@@ -68,17 +69,19 @@ def initialize():
     infoUpdate()
     storage.initialVariable()
     time.sleep(1)
-    api.setYaw(storage.initialYaw)
-    api.setYawPidOn(1)
-##    api.setPitch(storage.initialPitch)
-##    api.setPitchPidOn(1)
+    if (YawPidOn):
+        api.setYaw(storage.initialYaw)
+        api.setYawPidOn(1)
+    if (PitchPidOn):
+        api.setPitch(storage.initialPitch)
+        api.setPitchPidOn(1)
 
-def sink(depthSetPoint):
+def sink(depthSetPoint,sinkSpeed=10): #sinkSpeed is the sinking distance(cm) per second, usually 10 or 5.
     api.getDepth()
     api.setDepthPidOn(1)
     tempDepth = storage.depth
-    for i in range(int(depthSetPoint/5)):
-        api.setDepth((i+1)*5)
+    for i in range(int(depthSetPoint/sinkSpeed)):
+        api.setDepth((i+1)*sinkSpeed)
         time.sleep(1)
 
 # def stage0():
@@ -99,13 +102,12 @@ def path():
     dataLog.daemon = True
     dataLog.start()
     time.sleep(2)
-    sink(30)
-    # cameraThread = camera.camera_thread()
-    # cameraThread.daemon = True
-    # cameraThread.start()
+    sink(30,5)
+    # webCameraThread = camera.webCamera_thread()
+    # webCameraThread.daemon = True
+    # webCameraThread.start()
     time.sleep(2)
     print('Termainate now')
-    terminate()
     dataLog.stop()
     dataLog.join()
 
@@ -115,21 +117,18 @@ def dryTest():
     dataLog.daemon = True
     dataLog.start()
     time.sleep(10)
-    terminate()
     dataLog.stop()
     dataLog.join()
 
 def directionTest():
     storage.reset()
     api.move(0,0)
-    terminate()
 
 def lightTest():
     storage.reset()
     api.setMag(1)
     time.sleep(60)
     api.setMag(0)
-    terminate()
 
 def test():
     storage.reset()
@@ -144,6 +143,5 @@ def test():
 ##    time.sleep(5)
     time.sleep(20)
     ###############
-    terminate()
     dataLog.stop()
     dataLog.join()

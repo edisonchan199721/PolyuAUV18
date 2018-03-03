@@ -63,7 +63,7 @@ def send():
             if(storage.dataBuffer[0][0] >= 224):
                 receive(writeTo)
             else:
-                del storage.dataBuffer[0]   
+                del storage.dataBuffer[0]
         except serial.serialutil.SerialException:
             if (writeTo != -1):
                 print("Serial ",writeTo," Port:",server.serialName[writeTo]," is disconnected")
@@ -159,6 +159,9 @@ class server_thread(threading.Thread):
        while not storage.end:
            while not(len(storage.dataBuffer)==0):
                send()
+               # print(storage.dataBuffer)
+               # del storage.dataBuffer[0]
+               # time.sleep(0.5)
 
 ########################### Main ############################
 if __name__ == "__main__":

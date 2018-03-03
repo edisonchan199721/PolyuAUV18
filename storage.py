@@ -12,6 +12,7 @@ depth = 0
 yaw = 0
 pitch = 0
 roll = 0
+depthPid = False
 pitchPid = False
 yawPid = False
 yawSetPoint = 0
@@ -28,6 +29,9 @@ qualification = False # whether or not in qualifying round
 dataBuffer = [] # Data buffer that sending to arduino
 
 end = False # end of the whole program
+
+#image processing
+
 
 def reset():
     global motorValue, motor, depth, yaw, pitch, roll, pitchPid, yawPid, yawSetPoint, stage, dataBuffer, initialYaw, initialDepth, initialPitch, voltage, current
@@ -55,3 +59,4 @@ def initialVariable():
     initialYaw = yaw
     initialDepth = depth
     initialPitch = pitch
+    print("initialYaw:",initialYaw,"initialDepth:",initialDepth,"initialPitch",initialPitch)
