@@ -3,7 +3,7 @@ import math
 import cv2
 import numpy as np
 
-def get_extreme_red_points(image, show_result = False):
+def get_extreme_red_points(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     #common grey
@@ -35,7 +35,7 @@ def get_extreme_red_points(image, show_result = False):
         if cv2.contourArea(cx) < 20:
             break
         (x, y), (MA, ma), angle = cv2.fitEllipse(cx)
-        if (not ((angle < 45) or (angle > 135))) or (cv2.arcLength(cx, True) < 0):
+        if (not ((angle < 30) or (angle > 120))) or (cv2.arcLength(cx, True) < 350):
             del contours_red[-1]
         else:
             c = cx
@@ -45,22 +45,13 @@ def get_extreme_red_points(image, show_result = False):
         extreme_points_red = [tuple(c[c[:, :, 0].argmin()][0]), tuple(c[c[:, :, 0].argmax()][0]),
                               tuple(c[c[:, :, 1].argmin()][0]), tuple(c[c[:, :, 1].argmax()][0])]
     except:
-        print ('No red')
+        pass
+        #print ('No red')
 
-    if show_result:
-        print (extreme_points_red)
-        try:
-            for i in extreme_points_red:
-                cv2.circle(image_red, i, 10, (80, 255, 255), -1)
-        except:
-            pass
-        cv2.imshow('red mask', image_red)
-        key = cv2.waitKey(0)
-        cv2.destroyAllWindows()
     return extreme_points_red
 
 
-def get_extreme_green_points(image, show_result = False):
+def get_extreme_green_points(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     #common grey
@@ -68,9 +59,8 @@ def get_extreme_green_points(image, show_result = False):
     upper_grey = np.array([180, 20, 200])
 
     # green
-    lower_green = np.array([40, 15, 100])
-    upper_green = np.array([80, 55, 180])
-
+    lower_green = np.array([75, 153, 145])
+    upper_green = np.array([96, 230, 192])
     # mask
     mask_green = cv2.inRange(hsv, lower_green, upper_green)
     #mask_green += cv2.inRange(hsv, lower_grey, upper_grey)
@@ -90,12 +80,12 @@ def get_extreme_green_points(image, show_result = False):
         # last one is the largest contour
         cx = contours_green[-1]
         # Remining contour to small to be significant
-        if cv2.contourArea(cx) < 20:
+        if cv2.contourArea(cx) < 150:
             break
         # Get angle of the contour, prevent capturing the bottom green band
         # Or considering distant objects as blacks
         (x, y), (MA, ma), angle = cv2.fitEllipse(cx)
-        if (not ((angle < 45) or (angle > 135))) or (cv2.arcLength(cx, True) < 40):
+        if (not ((angle < 30) or (angle > 120))) or (cv2.arcLength(cx, True) < 350):
             del contours_green[-1]
         else:
             c = cx
@@ -105,34 +95,21 @@ def get_extreme_green_points(image, show_result = False):
         extreme_points_green = [tuple(c[c[:, :, 0].argmin()][0]), tuple(c[c[:, :, 0].argmax()][0])
             , tuple(c[c[:, :, 1].argmin()][0]), tuple(c[c[:, :, 1].argmax()][0])]
     except:
-        print ('No green')
+        pass
+        #print ('No green')
 
-    if show_result:
-        print (extreme_points_green)
-        try:
-            for i in extreme_points_green:
-                cv2.circle(image_green, i, 10, (80, 255, 255), -1)
-        except:
-            pass
-        cv2.imshow('green mask', image_green)
-        key = cv2.waitKey(0)
-        cv2.destroyAllWindows()
     return extreme_points_green
 
-def get_extreme_yellow_points(image, show_result = False):
+def get_extreme_yellow_points(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-    #common grey
-    lower_grey = np.array([0, 0, 100])
-    upper_grey = np.array([180, 20, 200])
-
     # yellow
-    lower_yellow = np.array([15, 15, 100])
-    upper_yellow = np.array([45, 55, 180])
+    lower_yellow = np.array([75, 90, 100])
+    upper_yellow = np.array([90, 180, 166])
+
 
     # mask
     mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
-    #mask_yellow += cv2.inRange(hsv, lower_grey, upper_grey)
 
     extreme_points_yellow = None
 
@@ -149,12 +126,12 @@ def get_extreme_yellow_points(image, show_result = False):
         # last one is the largest contour
         cx = contours_yellow[-1]
         # Remining contour to small to be significant
-        if cv2.contourArea(cx) < 20:
+        if cv2.contourArea(cx) < 150:
             break
         # Get angle of the contour, prevent capturing the bottom green band
         # Or considering distant objects as blacks
         (x, y), (MA, ma), angle = cv2.fitEllipse(cx)
-        if (not ((angle < 45) or (angle > 135))) or (cv2.arcLength(cx, True) < 40):
+        if (not ((angle < 30) or (angle > 120))) or (cv2.arcLength(cx, True) < 350):
             del contours_yellow[-1]
         else:
             c = cx
@@ -164,18 +141,9 @@ def get_extreme_yellow_points(image, show_result = False):
         extreme_points_yellow = [tuple(c[c[:, :, 0].argmin()][0]), tuple(c[c[:, :, 0].argmax()][0])
             , tuple(c[c[:, :, 1].argmin()][0]), tuple(c[c[:, :, 1].argmax()][0])]
     except:
-        print ('No yellow')
+        pass
+        #print ('No yellow')
 
-    if show_result:
-        print (extreme_points_yellow)
-        try:
-            for i in extreme_points_yellow:
-                cv2.circle(image_yellow, i, 10, (80, 255, 255), -1)
-        except:
-            pass
-        cv2.imshow('yellow mask', image_yellow)
-        key = cv2.waitKey(0)
-        cv2.destroyAllWindows()
     return extreme_points_yellow
 
 def gate_location_calculation(extreme_points_red, extreme_points_green):
