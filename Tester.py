@@ -20,7 +20,7 @@ if __name__ == "__main__":
     cap = cv2.VideoCapture('output1001.avi')
 
     while (cap.isOpened()):
-        cv2.waitKey(10)
+        cv2.waitKey(15)
         ret, frame = cap.read()
 
         yellow = detect.get_extreme_yellow_points(frame)

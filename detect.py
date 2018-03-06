@@ -32,10 +32,10 @@ def get_extreme_red_points(image):
         if len(contours_red) == 0:
             break
         cx = contours_red[-1]
-        if cv2.contourArea(cx) < 20:
+        if cv2.contourArea(cx) < 300 or cv2.contourArea(cx) > 3500 :
             break
         (x, y), (MA, ma), angle = cv2.fitEllipse(cx)
-        if (not ((angle < 30) or (angle > 120))) or (cv2.arcLength(cx, True) < 350):
+        if (not ((angle < 30) or (angle > 120))) or (cv2.arcLength(cx, True) < 180):
             del contours_red[-1]
         else:
             c = cx
@@ -80,14 +80,15 @@ def get_extreme_green_points(image):
         # last one is the largest contour
         cx = contours_green[-1]
         # Remining contour to small to be significant
-        if cv2.contourArea(cx) < 150:
+        if cv2.contourArea(cx) < 300 or cv2.contourArea(cx) > 3500 :
             break
         # Get angle of the contour, prevent capturing the bottom green band
         # Or considering distant objects as blacks
         (x, y), (MA, ma), angle = cv2.fitEllipse(cx)
-        if (not ((angle < 30) or (angle > 120))) or (cv2.arcLength(cx, True) < 350):
+        if (not ((angle < 30) or (angle > 120))) or (cv2.arcLength(cx, True) < 180):
             del contours_green[-1]
         else:
+            print cv2.arcLength(cx, False), " + ", cv2.contourArea(cx)
             c = cx
             break
     # LRTB
@@ -126,15 +127,18 @@ def get_extreme_yellow_points(image):
         # last one is the largest contour
         cx = contours_yellow[-1]
         # Remining contour to small to be significant
-        if cv2.contourArea(cx) < 150:
+        if cv2.contourArea(cx) < 300 or cv2.contourArea(cx) > 3500 :
             break
         # Get angle of the contour, prevent capturing the bottom green band
         # Or considering distant objects as blacks
         (x, y), (MA, ma), angle = cv2.fitEllipse(cx)
-        if (not ((angle < 30) or (angle > 120))) or (cv2.arcLength(cx, True) < 350):
+
+# or (cv2.arcLength(cx, True)/cv2.contourArea(cx) < 2.0)
+        if (not ((angle < 30) or (angle > 120))) or (cv2.arcLength(cx, True) < 180):
             del contours_yellow[-1]
         else:
             c = cx
+            print cv2.arcLength(cx, False), " + ", cv2.contourArea(cx)
             break
     # LRTB
     try:
