@@ -17,24 +17,30 @@ def showInfoEvent(event, x, y, flags, param):
 if __name__ == "__main__":
     cv2.namedWindow('frame')
     cv2.setMouseCallback('frame', showInfoEvent)
-    cap = cv2.VideoCapture('output1001.avi')
+    cap = cv2.VideoCapture('output1002.avi')
+    green_distance = detect.location()
+    yellow_distance = detect.location()
 
     while (cap.isOpened()):
         cv2.waitKey(15)
         ret, frame = cap.read()
 
         yellow = detect.get_extreme_yellow_points(frame)
-        green = detect.get_extreme_green_points(frame)
+        green = detect.getExPoints(1, frame)
         if yellow:
-            print "Y: ", yellow
-            for i in yellow:
-                cv2.circle(frame, i, 10, (0, 255, 255), -1)
+            #print ("Y: ", yellow)
+            for i, node in enumerate(yellow):
+                if i < 2:
+                    continue
+                cv2.circle(frame, node, 10, (0, 255, 255), -1)
         if green:
-            print "G: ", green
-            for i in green:
-                cv2.circle(frame, i, 10, (0, 255, 0), -1)
-
-
+            #print ("G: ", green)
+            for i, node in enumerate(green):
+                if i<2:
+                    continue
+                cv2.circle(frame, node, 10, (0, 255, 0), -1)
+            a = green_distance.average_distance(detect.gate_location_calculation(None, green)[2][0])
+            print (a, detect.gate_location_calculation(None, green)[2][1])
 
         cv2.imshow('frame', frame)
 
