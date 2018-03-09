@@ -22,13 +22,24 @@ initialPitch = 0
 voltage = 0
 current = 0
 
-stage = [False,False,False,False] # representing stage 1, 2, 3, 4
-
-qualification = False # whether or not in qualifying round
+stage = [False,False,False,False,False] # representing qualifying round and stage 1, 2, 3, 4
 
 dataBuffer = [] # Data buffer that sending to arduino
 
 end = False # end of the whole program
+
+# Camera object
+
+webCameraImage = None # webcam image
+yellowObject = []
+greenObject = []
+redObject = []
+
+# Object distance [0] and angle [1]
+
+yellowObjectInfo = []
+greenObjectInfo = []
+redObjectInfo = []
 
 #PID Variable
 depth_Kp = 0

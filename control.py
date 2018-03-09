@@ -7,6 +7,7 @@ import time
 import csv
 import camera as camera
 import sys
+import detect
 
 class control_thread(threading.Thread):
     def __init__(self):
@@ -14,15 +15,34 @@ class control_thread(threading.Thread):
 
     def run(self):
         time.sleep(1) #for setup waiting
-        dryTest()
+        dataLog = dataLog_thread()
+        dataLog.daemon = True
+        dataLog.start()
+        webCameraThread = camera.webCamera_thread()
+        webCameraThread.daemon = True
+        webCameraThread.start()
+        time.sleep(20) # For dry test
+        if(storage.stage[0]):
+            qualificationControl()
+            storage.stage[0] = False
+        if(storage.stage[1]):
+            stage1Control()
+            storage.stage[1] = False
         terminate()
+        webCameraThread.stop()
+        webCameraThread.join()
+        print("web cam join")
+        dataLog.stop()
+        dataLog.join()
+        print("datalog join")
+
 
 class dataLog_thread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__ (self)
         self.counter = 0
         self.end = False
-        self.rate = 0.1
+        self.rate = 1
 
     def run(self):
         csvfile = open('data.csv', 'a')
@@ -43,9 +63,28 @@ class dataLog_thread(threading.Thread):
         self.end = True
 
 def infoUpdate():
-##    api.getDepth()
-##    api.getYaw()
+    api.getDepth()
+    api.getYaw()
     api.getPitchRoll()
+    ## Image info update
+    storage.yellowObject = detect.getExPoints(2, storage.webCameraImage)
+    storage.greenObject = detect.getExPoints(1, storage.webCameraImage)
+    storage.redObject = detect.getExPoints(0, storage.webCameraImage)
+    if(storage.greenObject):
+        storage.greenObjectInfo=[self.green_distance.average_distance(detect.gate_location_calculation(None, storage.greenObject)[2][0]),detect.gate_location_calculation(None, storage.greenObject)[2][1]]
+    else:
+        storage.greenObjectInfo = []
+    if(storage.yellowObject):
+        storage.yellowObjectInfo=[self.yellow_distance.average_distance(detect.gate_location_calculation(None, storage.yellowObject)[2][0]),detect.gate_location_calculation(None, storage.yellowObject)[2][1]]
+    else:
+        storage.yellowObjectInfo = []
+    if(storage.redObject):
+        storage.redObjectInfo=[self.red_distance.average_distance(detect.gate_location_calculation(None, storage.redObject)[2][0]),detect.gate_location_calculation(None, storage.redObject)[2][1]]
+    else:
+        storage.redObjectInfo = []
+    print("Green Distance:",storage.greenObjectInfo[0],"Green Angle:",storage.greenObjectInfo[1])
+    print("Yellow Distance:",storage.greenObjectInfo[0],"Yellow Angle:",storage.greenObjectInfo[1])
+    print("Red Distance:",storage.greenObjectInfo[0],"Red Angle:",storage.greenObjectInfo[1])
 ##    api.getThruster2()
 ##    api.getThruster4()
 ##    api.getYawValue()
@@ -68,6 +107,8 @@ def initialize(YawPidOn=False,PitchPidOn=False):
     api.move(0,0)
     api.calDepth()
     infoUpdate()
+    api.setDepthPid(7,0,0)
+    api.setPitchPid(6,0.75,120)
     storage.initialVariable()
     time.sleep(1)
     if (YawPidOn):
@@ -80,62 +121,49 @@ def initialize(YawPidOn=False,PitchPidOn=False):
 def sink(depthSetPoint,sinkSpeed=10): #sinkSpeed is the sinking distance(cm) per second, usually 10 or 5.
     api.getDepth()
     api.setDepthPidOn(1)
-    tempDepth = storage.depth
     for i in range(int(depthSetPoint/sinkSpeed)):
         api.setDepth((i+1)*sinkSpeed)
         time.sleep(1)
+    while not (storage.depth >= (depthSetPoint-10) and storage.depth <= (depthSetPoint+10))
+        time.sleep(1)
 
-# def stage0():
-#
-#
-# def stage1():
-#
-# def stage2():
-#
-# def stage3():
-#
-# def stage4():
+def setYaw(yawSetPoint):
+    api.setYaw(yawSetPoint)
+    while not (storage.yaw >= (yawSetPoint-2) and storage.yaw <= (yawSetPoint+2)):
+        time.sleep(1)
 
-def path():
-    initialize(True, True)
-    dataLog = dataLog_thread()
-    dataLog.daemon = True
-    dataLog.start()
-##    webCameraThread = camera.webCamera_thread()
-##    webCameraThread.daemon = True
-##    webCameraThread.start()
-    time.sleep(2)
-    sink(20,5)
-    time.sleep(5)
-##    api.move(0,120)
-    time.sleep(10)
-    print('Termainate now')
-    dataLog.stop()
-    dataLog.join()
-    print("datalog join")
+def stage1Control():
+    sink(100,5)
+    while not (storage.greenObject):
+        searchGreenObject()
 
-def dryTest():
-    storage.reset()
-    dataLog = dataLog_thread()
-    dataLog.daemon = True
-    dataLog.start()
-    api.setDepthPid(5,0,0)
-    api.setPitchPid(6,0,50)
-    initialize(False,True)
-##    sink(30,5)
-##    time.sleep(5)
-##    api.move(0,250)
-##    time.sleep(3)
-##    api.move(180,250)
-    time.sleep(30)
-##    api.setPitchPidOn(0)
-##    api.setYawPidOn(0)
-    dataLog.stop()
-    dataLog.join()
+# def stage2Control():
+#
+# def stage3Control():
+#
+def stage4Control():
 
-def directionTest():
-    storage.reset()
+
+
+def searchGreenObject():
     api.move(0,0)
+    if(storage.greenObject):
+        return
+    for i in range(3):
+        setYaw(storage.initialYaw-((i+1)*20))
+        time.sleep(2)
+        if(storage.greenObject):
+            return
+    for i in range(3):
+        setYaw(storage.initialYaw+((i+1)*20))
+        time.sleep(2)
+        if(storage.greenObject):
+            return
+    setYaw(storage.initialYaw)
+    time.sleep(2)
+    api.move(0,100)
+    time.sleep(5)
+
 
 def lightTest():
     storage.reset()
@@ -143,18 +171,8 @@ def lightTest():
     time.sleep(60)
     api.setMag(0)
 
-def test():
-    storage.reset()
-    initialize(True)
-    dataLog = dataLog_thread()
-    dataLog.daemon = True
-    dataLog.start()
-    ##############
-##    api.move(0,60)
-##    time.sleep(5)
-##    api.move(180,60)
-##    time.sleep(5)
+def qualificationControl():
+    initialize(True,True)
+    sink(100,5)
+    move(0,200)
     time.sleep(20)
-    ###############
-    dataLog.stop()
-    dataLog.join()

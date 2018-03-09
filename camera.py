@@ -29,12 +29,10 @@ class piCamera_thread(threading.Thread):
         rawCapture = PiRGBArray(camera)
         time.sleep(2)
         while (not self.end):
-            print("inside loop")
             camera.capture(rawCapture, format="bgr")
             image = rawCapture.array
             cv2.imshow("raw", image)
-    ##        print(detect.get_extreme_red_points(image))
-    ##        print('a')
+            storage.webCameraImage = image
 
 class webCamera_thread(threading.Thread):
     def __init__(self):
@@ -42,6 +40,9 @@ class webCamera_thread(threading.Thread):
         self._is_running = False
         self.end = False
         self.frame = None
+        self.green_distance = detect.location()
+        self.yellow_distance = detect.location()
+        self.red_distance = detect.location()
 
     def showInfoEvent(self, event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONDOWN:
@@ -69,10 +70,9 @@ class webCamera_thread(threading.Thread):
             # Our operations on the frame come here
             # Display the resulting frame
             cv2.imshow('frame',self.frame)
+            storage.webCameraImage = self.frame
             ###########################
             ###########################
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                 self.stop()
         # When everything done, release the capture
         cap.release()
         cv2.destroyAllWindows()
@@ -88,7 +88,7 @@ class webCamera_thread(threading.Thread):
             if ret==True:
 ##                cv2.imshow('frame',frame)
                 frame = cv2.flip(frame,0)
-                
+
                 # write the flipped frame
                 out.write(frame)
             else:
@@ -134,5 +134,3 @@ if __name__ == "__main__":
     print("webcam join")
     piCameraThread.join()
     print("picam join")
-    
-    
